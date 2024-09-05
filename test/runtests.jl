@@ -1,6 +1,15 @@
+using CondaPkg, PythonCall
+
 using Kerchunk
+
+# Raster creation and analysis packages
+using Rasters, NCDatasets # to save a raster
+using YAXArrays # to open a raster
+using 
+
 using Test
 
 @testset "Kerchunk.jl" begin
-    # Write your tests here.
+    include("python_local_kerchunk.jl")
+    include("its_live.jl")
 end

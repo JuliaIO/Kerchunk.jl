@@ -1,0 +1,10 @@
+[deps]
+netcdf4 = ""
+h5py = ""
+xarray = ""
+zarr = ""
+certifi = ""
+s3fs = ""
+pyperf = ""
+kerchunk = ""
+pydap = ""
