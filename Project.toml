@@ -1,0 +1,13 @@
+name = "Kerchunk"
+uuid = "12c09fd5-fe6a-4e79-8f42-b31f49215243"
+authors = ["Anshul Singhvi <anshulsinghvi@gmail.com> and contributors"]
+version = "0.1.0-DEV"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
