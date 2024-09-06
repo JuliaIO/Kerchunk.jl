@@ -5,7 +5,6 @@ using Kerchunk
 # Raster creation and analysis packages
 using Rasters, NCDatasets # to save a raster
 using YAXArrays # to open a raster
-using 
 
 using Test
 
