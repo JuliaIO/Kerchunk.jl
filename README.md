@@ -4,13 +4,15 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaIO.github.io/Kerchunk.jl/dev/)
 [![Build Status](https://github.com/JuliaIO/Kerchunk.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaIO/Kerchunk.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
-Kerchunk.jl is a Julia package that enables loading Kerchunk reference catalogs as Zarr arrays via a storage backend.
+Kerchunk.jl is a Julia package that enables loading [Kerchunk reference catalogs](https://fsspec.github.io/kerchunk/) as [Zarr.jl](https://github.com/JuliaIO/Zarr.jl) arrays.
 
 ## Installation
 
+This still relies on an experimental branch of Zarr.jl to read most Kerchunk files.
+
 ```julia
 ] 
-add Kerchunk
+add Kerchunk Zarr#as/filters
 ```
 
 ## Quick start
@@ -27,7 +29,7 @@ YAXArrays.open_dataset(za)
 
 ## Background
 
-[`kerchunk`] is a Python package that generates the reference catalogs.
+[`kerchunk`](https://fsspec.github.io/kerchunk/) is a Python package that generates the reference catalogs.
 
 ## Limitations
 - No support for `gen` references with templates.
