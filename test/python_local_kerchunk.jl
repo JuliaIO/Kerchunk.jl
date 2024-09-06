@@ -1,9 +1,7 @@
 using CondaPkg, PythonCall
 
-using FSSpec, Zarr, JSON3
+using Zarr, JSON3
 
-const xr = pyimport("xarray")
-const fsspec = pyimport("fsspec")
 # You can't import kerchunk.hdf because importing h5py introduces a version of libhdf5 that is incompatible with any extant netcdf4_jll.
 
 
@@ -34,10 +32,10 @@ with open('test.json', 'w') as f:
         ```) # strange indenting because I had weird Python indentation issues when there were spaces...
     end
 
-    py_kerchunk_catalog = JSON3.read(read("test.json", String)) |> FSSpec._recursive_pyconvert 
+    py_kerchunk_catalog = JSON3.read(read("test.json", String))
 
-    st = FSSpec.FSStore("reference://"; fo = "test.json")
-    st2 = FSSpec.FSStore("reference://"; fo = py_kerchunk_catalog)
+    st  = Kerchunk.ReferenceStore("test.json")
+    st2 = Kerchunk.ReferenceStore(py_kerchunk_catalog)
 
     #=
     # explore why fsspec might be causing problems
