@@ -29,6 +29,10 @@ YAXArrays.open_dataset(za)
 
 [`kerchunk`] is a Python package that generates the reference catalogs.
 
+## Limitations
+- No support for `gen` references with templates.
+- No support for complex Jinja2 templates in `refs`.  (Although Kerchunk hardly supports this either...)
+
 ## Alternatives and related packages
 
 - You can always use Python's `xarray` directly via PythonCall.jl
