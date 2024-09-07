@@ -9,6 +9,6 @@ Documentation for [Kerchunk](https://github.com/JuliaIO/Kerchunk.jl).
 ```@index
 ```
 
-```@autodocs
-Modules = [Kerchunk]
+```@docs
+ReferenceStore
 ```

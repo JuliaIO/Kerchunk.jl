@@ -35,6 +35,10 @@ YAXArrays.open_dataset(za)
 - No support for `gen` references with templates.
 - No support for complex Jinja2 templates in `refs`.  (Although Kerchunk hardly supports this either...)
 
+## Acknowledgements
+
+This effort was funded by the NASA MEaSUREs program in contribution to the Inter-mission Time Series of Land Ice Velocity and Elevation (ITS_LIVE) project (https://its-live.jpl.nasa.gov/).
+
 ## Alternatives and related packages
 
 - You can always use Python's `xarray` directly via PythonCall.jl
@@ -42,3 +46,4 @@ YAXArrays.open_dataset(za)
 
 This package is of course built on top of [Zarr.jl](https://github.com/JuliaIO/Zarr.jl), which is a pure-Julia Zarr array library.
 [YAXArrays.jl](https://github.com/JuliaDataCubes/YAXArrays.jl) is a Julia package that can wrap Zarr arrays in a DimensionalData-compatible interface.
+

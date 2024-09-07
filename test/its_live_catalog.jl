@@ -8,3 +8,6 @@ using Test
     za = Zarr.zopen(st)
     @test_nowarn za["vx"][1, 1] # test that reading works
 end
+
+# test ICESAT2 data
+# p"s3://mymdtemp/icesat2-4.01.json"

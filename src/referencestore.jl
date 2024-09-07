@@ -57,6 +57,11 @@ Files can also be generated, so we have to parse that and then actually material
 ```
 =#
 
+"""
+    ReferenceStore(filename_or_dict)
+
+A `ReferenceStore` is a 
+"""
 struct ReferenceStore{MapperType <: AbstractDict, HasTemplates} <: Zarr.AbstractStore
     mapper::MapperType
     zmetadata::Dict{String, Any}
@@ -127,24 +132,40 @@ end
 
 # Implement the Zarr interface
 
-function Zarr.subdirs(store::ReferenceStore, key)
-    path = rstrip(key, '/')
-    l_path = length(path)
-    sub_sub_keys = filter(keys(store)) do k
-        startswith(string(k), isempty(key) ? "" : key * "/") && # path is a child of the key
-        '/' in string(k)[l_path+1:end] # path has children
+# Utility functions copied from Zarr.jl
+function _pdict(d::AbstractDict{<: Symbol, Any}, path)
+    p = (isempty(path) || endswith(path,'/')) ? path : path*'/'
+    return filter(((k,v),) -> startswith(string(k), path) ,d)
+end
+
+function _searchsubdict(d2,p,condition)
+    o = Set{String}()
+    pspl = split(rstrip(p,'/'), '/')
+    lp = if length(pspl) == 1 && isempty(pspl[1])
+        0
+    else
+        length(pspl)
     end
-    sub_dirs = unique!([rsplit(string(sub_sub_key), "/", limit=2)[1] for sub_sub_key in sub_sub_keys])
-    return sub_dirs
+    for k in Iterators.map(string, keys(d2))
+      sp = split(k,'/')
+        if condition(sp,lp)
+            push!(o,sp[lp+1])
+        end
+    end
+    collect(o)
+end
+
+
+# The actual Zarr store API implementation folloes.
+
+function Zarr.subdirs(store::ReferenceStore, key)
+    d2 = _pdict(d, p)
+    return searchsubdict(d2, p, (sp, lp) -> length(sp) > lp + 1)
 end
 
 function Zarr.subkeys(store::ReferenceStore, key::String)
-    path = rstrip(key, '/')
-    l_path = length(path)
-    return filter(keys(store)) do k
-        startswith(string(k), isempty(key) ? "" : key * "/") && # path is a child of the key
-        '/' ∉ string(k)[l_path+2:end] # path has no children
-    end .|> string
+    d2 = _pdict(d,p)
+    _searchsubdict(d2,p,(sp,lp)->length(sp) == lp+1)
 end
 
 function Zarr.storagesize(store::ReferenceStore, key::String) 
