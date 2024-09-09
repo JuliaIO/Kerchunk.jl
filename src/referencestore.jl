@@ -156,16 +156,42 @@ function _searchsubdict(d2,p,condition)
 end
 
 
-# The actual Zarr store API implementation folloes.
+# The actual Zarr store API implementation follows.
+
+push!(Zarr.storageregexlist,r"^reference://"=>ReferenceStore)
+
+function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
+    
+    # Parse the resolved string as a URI
+    uri = URIs.URI(url[(length("reference://")+1):end])
+
+    # If the URI's scheme is empty, we're resolving a local file path.
+    # Note that we always use PosixPaths here, because the Zarr spec mandates that
+    # all path separators be forward slashes.  Kerchunk also mandates this.
+    file_path = if isempty(uri.scheme)
+        if isabspath(uri.uri)
+            FilePathsBase.PosixPath(uri.uri)
+        elseif ispath(uri.uri)
+            FilePathsBase.PosixPath(joinpath(pwd(), uri.uri))
+        else
+            error("Invalid path, presumed local but not resolvable as absolute or relative path: $(uri.path)")
+        end
+    elseif uri.scheme == "file" # Otherwise, we check the protocol and create the appropriate path type.
+        FilePathsBase.SystemPath(uri.path)
+    elseif uri.scheme == "s3"
+        AWSS3.S3Path(uri.uri)
+    end # TODO: add more protocols, like HTTP, Google Cloud, Azure, etc.
+    return ReferenceStore(file_path), "" # ReferenceStore never has a relative path
+end
 
 function Zarr.subdirs(store::ReferenceStore, key)
-    d2 = _pdict(d, p)
-    return searchsubdict(d2, p, (sp, lp) -> length(sp) > lp + 1)
+    d2 = _pdict(store.mapper, key)
+    return _searchsubdict(d2, key, (sp, lp) -> length(sp) > lp + 1)
 end
 
 function Zarr.subkeys(store::ReferenceStore, key::String)
-    d2 = _pdict(d,p)
-    _searchsubdict(d2,p,(sp,lp)->length(sp) == lp+1)
+    d2 = _pdict(store.mapper, key)
+    _searchsubdict(d2, key, (sp,lp)->length(sp) == lp+1)
 end
 
 function Zarr.storagesize(store::ReferenceStore, key::String) 
@@ -190,14 +216,20 @@ function Zarr.read_items!(store::ReferenceStore, c::AbstractChannel, p, i)
     cinds = [Zarr.citostring(ii) for ii in i]
     ckeys = ["$p/$cind" for cind in cinds]
     for (idx, ii) in enumerate(i)
-        put!(c, (ii => _get_file_bytes(store, store[ckeys[idx]])))
+        file_value = if Zarr.isinitialized(store, ckeys[idx])
+            _get_file_bytes(store, store[ckeys[idx]])
+        else
+            nothing
+        end
+        put!(c, (ii => file_value))
     end
 end
 
-function Zarr.isinitialized(store::ReferenceStore, p::String)
+function Zarr.isinitialized(store::ReferenceStore, p::String) # TODO: this is broken?!
     return haskey(store.mapper, p)
 end
-function Zarr.isinitialized(store::ReferenceStore, p::String, i::Int)
+
+function Zarr.isinitialized(store::ReferenceStore, p::String, i::Int) # TODO: this is broken?!
     return haskey(store.mapper, "$p/$i")
 end
 
