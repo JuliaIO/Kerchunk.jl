@@ -73,7 +73,7 @@ makedocs(;
     modules=[Kerchunk],
     authors="Anshul Singhvi <anshulsinghvi@gmail.com> and contributors",
     sitename="Kerchunk.jl",
-    format=MarkdownVitepress(repo = "https://github.com/JuliaIO/Kerchunk.jl",)
+    format=MarkdownVitepress(repo = "github.com/JuliaIO/Kerchunk.jl"),
     pages=[
         "Home" => "index.md",
         "What is Kerchunk?" => "what_the_heck.md",
