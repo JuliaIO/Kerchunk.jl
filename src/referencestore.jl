@@ -343,11 +343,11 @@ end
 
 This function applies the templates stored in `store` to the source string, and returns the resolved string.
 
-It uses Mustache.jl under the hood, but all `{{template}}` values are set to **not** URI-encode characters.
+It uses Mustache.jl under the hood, but all `{` `{` `template` `}` `}` values are set to **not** URI-encode characters.
 """
 function apply_templates(store::ReferenceStore, source::String)
     tokens = Mustache.parse(source)
-    # Adjust tokens so that `{{var}}` becomes `{{{var}}}`, the latter of which
+    # Adjust tokens so that `{` `{` var `}` `}` becomes `{` `{` `{` var `}` `}` `}`, the latter of which
     # is rendered without URI escaping.
     for token in tokens.tokens
         if token._type == "name"
