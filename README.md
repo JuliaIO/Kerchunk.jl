@@ -12,7 +12,7 @@ This still relies on an experimental branch of Zarr.jl to read most Kerchunk fil
 
 ```julia
 ] 
-add Kerchunk Zarr#as/filters
+add Kerchunk Zarr#as/filters ZarrDatasets#as/dataset_from_store
 ```
 
 ## Quick start

@@ -17,4 +17,8 @@ include("materialize.jl")
 
 export ReferenceStore
 
+function __init__()
+    push!(Zarr.storageregexlist, r"^reference://"=>ReferenceStore)
+end
+
 end

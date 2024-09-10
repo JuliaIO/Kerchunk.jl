@@ -158,8 +158,6 @@ end
 
 # The actual Zarr store API implementation follows.
 
-push!(Zarr.storageregexlist,r"^reference://"=>ReferenceStore)
-
 function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
     
     # Parse the resolved string as a URI
