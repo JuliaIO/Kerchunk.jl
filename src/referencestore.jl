@@ -213,7 +213,7 @@ function Zarr.storagesize(store::ReferenceStore, key::String)
 end
 
 
-function Zarr.read_items!(store::ReferenceStore, c::AbstractChannel, p, i)
+function Zarr.read_items!(store::ReferenceStore, c::AbstractChannel, ::Zarr.SequentialRead, p, i)
     cinds = [Zarr.citostring(ii) for ii in i]
     ckeys = ["$p/$cind" for cind in cinds]
     for (idx, ii) in enumerate(i)
@@ -225,6 +225,24 @@ function Zarr.read_items!(store::ReferenceStore, c::AbstractChannel, p, i)
         put!(c, (ii => file_value))
     end
 end
+
+
+function Zarr.read_items!(store::ReferenceStore, c::AbstractChannel, r::Zarr.ConcurrentRead, p, i)
+    cinds = [Zarr.citostring(ii) for ii in i]
+    ckeys = ["$p/$cind" for cind in cinds]
+
+    ntasks = r.ntasks
+    #@show ntasks
+    asyncmap(i, ckeys, ntasks = ntasks) do ii, key
+        file_value = if Zarr.isinitialized(store, key)
+            _get_file_bytes(store, store[key])
+        else
+            nothing
+        end
+        put!(c, (ii => file_value))
+    end
+end
+
 
 function Zarr.isinitialized(store::ReferenceStore, p::String) # TODO: this is broken?!
     return haskey(store.mapper, p)
@@ -243,7 +261,7 @@ else
     Dict{String, Any}()
 end
 
-Zarr.store_read_strategy(::ReferenceStore) = Zarr.SequentialRead()
+Zarr.store_read_strategy(::ReferenceStore) = Zarr.ConcurrentRead(Zarr.concurrent_io_tasks[])
 Zarr.read_items!(s::ReferenceStore, c::AbstractChannel, ::Zarr.SequentialRead, p, i) = Zarr.read_items!(s, c, p, i)
 
 
