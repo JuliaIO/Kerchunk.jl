@@ -58,9 +58,12 @@ Files can also be generated, so we have to parse that and then actually material
 =#
 
 """
-    ReferenceStore(filename_or_dict)
+    ReferenceStore(filename_or_dict) <: Zarr.AbstractStore
 
 A `ReferenceStore` is a 
+
+Generally, you will only need to construct this if you have an in-memory
+Dict or other representation.
 """
 struct ReferenceStore{MapperType <: AbstractDict, HasTemplates} <: Zarr.AbstractStore
     mapper::MapperType

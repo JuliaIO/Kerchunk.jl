@@ -9,6 +9,8 @@ using YAXArrays # to open a raster
 using Test
 
 @testset "Kerchunk.jl" begin
-    include("python_local_kerchunk.jl")
-    include("its_live.jl")
+    @static if !(Sys.iswindows())
+        include("python_local_kerchunk.jl")
+    end
+    include("its_live_catalog.jl")
 end

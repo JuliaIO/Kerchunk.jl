@@ -20,11 +20,19 @@ add Kerchunk Zarr#as/filters ZarrDatasets#as/dataset_from_store
 ```julia
 using Kerchunk, Zarr
 
-za = Zarr.zopen(Kerchunk.ReferenceStore("path/to/kerchunk/catalog.json"))
+za = Zarr.zopen("reference://path/to/kerchunk/catalog.json")
 # and treat it like any other Zarr array!
 # You can even wrap it in YAXArrays.jl to get DimensionalData.jl accessors:
 using YAXArrays
 YAXArrays.open_dataset(za)
+# or open it as a Rasters.RasterStack:
+using Rasters
+Rasters.RasterStack(
+    "reference://catalog.json", 
+    source = Rasters.Zarrsource(),
+    lazy = true, # need to include this
+) # source must be explicit
+
 ```
 
 ## Background
