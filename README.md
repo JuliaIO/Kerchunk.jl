@@ -12,10 +12,14 @@ This still relies on an experimental branch of Zarr.jl to read most Kerchunk fil
 
 ```julia
 ] 
-add Kerchunk Zarr#as/filters ZarrDatasets#as/dataset_from_store
+add Kerchunk Zarr#as/filters https://github.com/asinghvi17/Rasters.jl#as/makie_and_cf
 ```
 
+(clean up by running `]free Zarr ZarrDatasets Rasters`)
+
 ## Quick start
+
+Kerchunk.jl is simply a storage backend to [`Zarr.jl`](https://github.com/JuliaIO/Zarr.jl).  Zarr does integrate with the more fully featured packages [`Rasters.jl`](https://github.com/rafaqz/Rasters.jl) and [`YAXArrays.jl`](https://github.com/JuliaDataCubes/YAXArrays.jl), which are the packages you will want to use to interact with Kerchunk data.
 
 ```julia
 using Kerchunk, Zarr
@@ -32,8 +36,9 @@ Rasters.RasterStack(
     source = Rasters.Zarrsource(),
     lazy = true, # need to include this
 ) # source must be explicit
-
 ```
+
+It's most useful to open Kerchunk datasets as either RasterStacks or YAXArrays datasets, since both of those packages have great dimensionality support
 
 ## Background
 
