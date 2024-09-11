@@ -212,6 +212,7 @@ function Zarr.storagesize(store::ReferenceStore, key::String)
     end
 end
 
+Zarr.store_read_strategy(::ReferenceStore) = Zarr.ConcurrentRead(Zarr.concurrent_io_tasks[])
 
 function Zarr.read_items!(store::ReferenceStore, c::AbstractChannel, ::Zarr.SequentialRead, p, i)
     cinds = [Zarr.citostring(ii) for ii in i]
@@ -260,9 +261,6 @@ Zarr.getattrs(store::ReferenceStore, p::String) = if haskey(store.mapper, normpa
 else
     Dict{String, Any}()
 end
-
-Zarr.store_read_strategy(::ReferenceStore) = Zarr.ConcurrentRead(Zarr.concurrent_io_tasks[])
-Zarr.read_items!(s::ReferenceStore, c::AbstractChannel, ::Zarr.SequentialRead, p, i) = Zarr.read_items!(s, c, p, i)
 
 
 # End of Zarr interface implementation
