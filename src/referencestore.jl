@@ -69,6 +69,8 @@ struct ReferenceStore{MapperType <: AbstractDict, HasTemplates} <: Zarr.Abstract
     mapper::MapperType
     zmetadata::Dict{String, Any}
     templates::Dict{String, String}
+    cache::Dict{String, Tuple{String}}
+    cache_dir::String
 end
 
 function ReferenceStore(filename::Union{String, FilePathsBase.AbstractPath})
@@ -104,7 +106,10 @@ function ReferenceStore(parsed::AbstractDict{<: Union{String, Symbol}, <: Any})
 
     refs = parsed["refs"]
 
-    return ReferenceStore{typeof(refs), has_templates}(refs, zmetadata, templates)
+    cache_dict = Dict{String, Tuple{String}}()
+    cache_dir = mktempdir(; prefix = "jl_kerchunk_", cleanup = true)
+
+    return ReferenceStore{typeof(refs), has_templates}(refs, zmetadata, templates, cache_dict, cache_dir)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", store::ReferenceStore)
@@ -116,7 +121,11 @@ function Base.show(io::IO, store::ReferenceStore)
 end
 
 function Base.getindex(store::ReferenceStore, key::String)
-    return store.mapper[key]
+    if haskey(store.cache, key)
+        return only(store.cache[key])
+    else
+        return store.mapper[key]
+    end
 end
 
 function Base.setindex!(store::ReferenceStore, value, key::String)
@@ -300,6 +309,7 @@ function _get_file_bytes(store::ReferenceStore, spec::JSON3.Array)
     end
 end
 
+_get_file_bytes(store::ReferenceStore, spec::Tuple{String}) = read(resolve_uri(store, only(spec)))
 
 """
     resolve_uri(store::ReferenceStore, source::String)
