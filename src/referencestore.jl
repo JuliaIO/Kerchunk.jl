@@ -188,7 +188,10 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
     
     # Parse the resolved string as a URI
     uri = URIs.URI(url[(length("reference://")+1):end])
-
+    # Extract the parameters, and reformat the URI
+    params = URIs.queryparams(uri)
+    uri = URIs.URI(uri; query = "")
+    
     # If the URI's scheme is empty, we're resolving a local file path.
     # Note that we always use PosixPaths here, because the Zarr spec mandates that
     # all path separators be forward slashes.  Kerchunk also mandates this.
@@ -205,7 +208,16 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
     elseif uri.scheme == "s3"
         AWSS3.S3Path(uri.uri)
     end # TODO: add more protocols, like HTTP, Google Cloud, Azure, etc.
-    return ReferenceStore(file_path), "" # ReferenceStore never has a relative path
+
+    rs = ReferenceStore(file_path) 
+
+    # Apply corrections based on URI parameters / query if necessary
+    if haskey(params, "decode_cf") && lowercase(params["decode_cf"]) == "true"
+        apply_cf_corrections!(rs)
+    end
+    # One could add more corrections here...
+
+    return rs, "" # ReferenceStore never has a relative path
 end
 
 function Zarr.subdirs(store::ReferenceStore, key)

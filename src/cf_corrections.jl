@@ -171,3 +171,20 @@ function move_compressor_from_filters!(zarray::Dict{Symbol, <: Any}, zattrs::Dic
         end
     end
 end
+
+
+# # CF correction mega function
+
+function apply_cf_corrections!(store::ReferenceStore)
+    if haskey(store.mapper, ".zmetadata")
+        @warn "Kerchunk.jl cannot apply corrections on consolidated stores yet!"
+        return
+    end
+
+    for dir in Zarr.subdirs(store, "")
+        if Zarr.is_zarray(dir)
+            do_correction!(move_compressor_from_filters!, store, dir)
+            do_correction!(add_scale_offset_filter_and_set_mask!, store, dir)
+        end
+    end
+end
