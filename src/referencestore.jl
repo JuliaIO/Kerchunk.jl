@@ -60,10 +60,24 @@ Files can also be generated, so we have to parse that and then actually material
 """
     ReferenceStore(filename_or_dict) <: Zarr.AbstractStore
 
-A `ReferenceStore` is a 
+A `ReferenceStore` is a "fake filesystem" encoded by some key-value store dictionary,
+either held in memory, or read from a JSON file in the [Kerchunk format](https://fsspec.github.io/kerchunk/).
 
 Generally, you will only need to construct this if you have an in-memory
-Dict or other representation.
+Dict or other representation, or if you want to explicitly modify the store
+before constructing a ZGroup, which eagerly loads metadata.
+
+## Extended help
+
+## Implementation
+
+The reference store has several fields:
+
+- `mapper`: The actual key-value store that file information (`string of base64 bytes`, `[single uri]`, `[uri, byte_offset, byte_length]`)
+    is stored in.  The type here is parametrized so this may be mutable if in memory, or immutable, e.g a JSON3.Object.
+- `zmetadata`: The toplevel Zarr metadata, sometimes stored separately.
+- `templates`: Key-value store for template expansion, if URLs need to be compressed.
+- `cache`: Key-value store for explicitly downloaded or otherwise modified keys.
 """
 struct ReferenceStore{MapperType <: AbstractDict, HasTemplates} <: Zarr.AbstractStore
     mapper::MapperType
