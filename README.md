@@ -38,7 +38,7 @@ Rasters.RasterStack(
 ) # source must be explicit
 ```
 
-It's most useful to open Kerchunk datasets as either RasterStacks or YAXArrays datasets, since both of those packages have great dimensionality support
+It's most useful to open Kerchunk datasets as either RasterStacks or YAXArrays datasets, since both of those packages have great dimensionality support.
 
 ## Background
 
