@@ -24,33 +24,35 @@ using Test
     CondaPkg.withenv() do
         run(```
 $(CondaPkg.which("python")) -c "
+import kerchunk
 import kerchunk.hdf as hdf; import os; import ujson
 h5chunks = hdf.SingleHdf5ToZarr('test.nc', inline_threshold=300)
 with open('test.json', 'w') as f:
     f.write(ujson.dumps(h5chunks.translate())) 
 "
-        ```) # strange indenting because I had weird Python indentation issues when there were spaces...
+```) # strange indenting because I had weird Python indentation issues when there were spaces...
     end
 
     py_kerchunk_catalog = JSON3.read(read("test.json", String))
 
-    st  = Kerchunk.ReferenceStore("test.json")
-    st2 = Kerchunk.ReferenceStore(py_kerchunk_catalog)
-
-    #=
-    # explore why fsspec might be causing problems
-    fs, = fsspec.core.url_to_fs("s3://its-live-data/datacubes/v2/N00E020/ITS_LIVE_vel_EPSG32735_G0120_X750000_Y10050000.zarr")
-    fs2, = fsspec.core.url_to_fs("reference://"; fo = py_kerchunk_catalog)
-    st.mapper.dirfs.ls("/")
-    =#
+    st1  = Kerchunk.ReferenceStore("test.json") # read from the kerchunk
+    st2 = Kerchunk.ReferenceStore(py_kerchunk_catalog) # in-memory
 
     # ds = xr.open_dataset("reference://", engine="zarr", backend_kwargs={"consolidated": False, "storage_options": {"fo" : h5chunks.translate()}})
 
-    ds = Zarr.zopen(st; consolidated = false)
+    ds = Zarr.zopen(st1; consolidated = false)
 
     ya = YAXArrays.open_dataset(ds)
 
     @test all(map(==, ya["unnamed"] |> collect, ras |> collect)) # if not, this goes to YAXArrays 
+
+    # Mutate the store by translating some CF standards to Zarr
+    Kerchunk.apply_cf_corrections!(st1)
+    # Now, try again.
+    ds = Zarr.zopen(st1; consolidated = false)
+
+    @test all(map(==, ds["unnamed"] |> collect, ras |> collect)) # if not, this goes to YAXArrays 
+
 
     ds = Zarr.zopen(st2; consolidated = false)
 
