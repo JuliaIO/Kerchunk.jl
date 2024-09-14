@@ -154,7 +154,7 @@ distinguish between compressors and filters.  This function will not be needed
 for Zarr v3 datasets, since the compressors and filters are all codecs in that 
 schema.
 """
-function move_compressor_from_filters!(zarray::Dict{Symbol, <: Any}, zattrs::Dict{Symbol, <: Any})
+function move_compressor_from_filters!(zarray::Dict, zattrs::Dict)
     if get(zarray, "filters", nothing) |> isnothing
         return # No filters, so nothing to be done here
     else # there are some filters
@@ -182,7 +182,7 @@ function apply_cf_corrections!(store::ReferenceStore)
     end
 
     for dir in Zarr.subdirs(store, "")
-        if Zarr.is_zarray(dir)
+        if Zarr.is_zarray(store, dir)
             do_correction!(move_compressor_from_filters!, store, dir)
             do_correction!(add_scale_offset_filter_and_set_mask!, store, dir)
         end

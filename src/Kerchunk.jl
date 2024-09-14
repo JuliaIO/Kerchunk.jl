@@ -6,7 +6,7 @@ using FilePathsBase, AWSS3 # to access files
 using Zarr # this is where the magic happens
 
 # Zarr filters that are not yet released in Zarr.jl
-@static if :FixedScaleOffsetFilter in names(Zarr; all = true)
+@static if !(:FixedScaleOffsetFilter in names(Zarr; all = true))
     include("required_zarr_filters.jl")
 end
 
@@ -37,7 +37,7 @@ export ZarrStorePath
 function __init__()
     push!(Zarr.storageregexlist, r"^reference://"=>ReferenceStore)
     Zarr.filterdict["astype"] = AstypeFilter
-    @static if :FixedScaleOffsetFilter in names(Zarr; all = true)
+    @static if !(:FixedScaleOffsetFilter in names(Zarr; all = true))
         filterdict["delta"] = DeltaFilter
         filterdict["fixedscaleoffset"] = FixedScaleOffsetFilter
         filterdict["fletcher32"] = Fletcher32Filter

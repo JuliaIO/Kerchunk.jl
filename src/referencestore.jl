@@ -94,7 +94,7 @@ end
 
 function ReferenceStore(parsed::AbstractDict{<: Union{String, Symbol}, <: Any})
     @assert haskey(parsed, "version") "ReferenceStore requires a version field, did not find one.  if you have a Kerchunk v0 then you have a problem!"
-    @assert parsed["version"] == 1 "ReferenceStore only supports Kerchunk version 1, found $version"
+    @assert parsed["version"] in (1, "1") "ReferenceStore only supports Kerchunk version 1, found $(parsed["version"])"
     @assert !haskey(parsed, "gen") "ReferenceStore does not support generated paths, please file an issue on Github if you need these!"
 
     has_templates = haskey(parsed, "templates")
@@ -159,9 +159,14 @@ end
 # Implement the Zarr interface
 
 # Utility functions copied from Zarr.jl
-function _pdict(d::AbstractDict{<: Symbol, Any}, path)
+function _pdict(d::AbstractDict{<: Symbol, <: Any}, path)
     p = (isempty(path) || endswith(path,'/')) ? path : path*'/'
     return filter(((k,v),) -> startswith(string(k), path) ,d)
+end
+
+function _pdict(d::AbstractDict{<: String, <: Any}, path)
+    p = (isempty(path) || endswith(path,'/')) ? path : path*'/'
+    return filter(((k,v),) -> startswith(k, path) ,d)
 end
 
 function _searchsubdict(d2,p,condition)
@@ -190,7 +195,7 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
     uri = URIs.URI(url[(length("reference://")+1):end])
     # Extract the parameters, and reformat the URI
     params = URIs.queryparams(uri)
-    uri = URIs.URI(uri; query = "")
+    uri = URIs.URI(uri; query = URIs.absent)
     
     # If the URI's scheme is empty, we're resolving a local file path.
     # Note that we always use PosixPaths here, because the Zarr spec mandates that
@@ -201,10 +206,10 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
         elseif ispath(uri.uri)
             FilePathsBase.PosixPath(joinpath(pwd(), uri.uri))
         else
-            error("Invalid path, presumed local but not resolvable as absolute or relative path: $(uri.path)")
+            error("Invalid path, presumed local but not resolvable as absolute or relative path: $(uri)")
         end
     elseif uri.scheme == "file" # Otherwise, we check the protocol and create the appropriate path type.
-        FilePathsBase.SystemPath(uri.path)
+        FilePathsBase.Path(uri.path)
     elseif uri.scheme == "s3"
         AWSS3.S3Path(uri.uri)
     end # TODO: add more protocols, like HTTP, Google Cloud, Azure, etc.
@@ -228,6 +233,16 @@ end
 function Zarr.subkeys(store::ReferenceStore, key::String)
     d2 = _pdict(store.mapper, key)
     _searchsubdict(d2, key, (sp,lp)->length(sp) == lp+1)
+end
+
+Zarr.getmetadata(s::ReferenceStore, p,fill_as_missing) = Zarr.Metadata(String((_get_file_bytes(s, s[p,".zarray"]))),fill_as_missing)
+function Zarr.getattrs(s::ReferenceStore, p)
+    atts = _get_file_bytes(s, s[p,".zattrs"])
+    if atts === nothing
+        Dict()
+    else
+        JSON.parse(replace(String((atts)),": NaN,"=>": \"NaN\","))
+    end
 end
 
 function Zarr.storagesize(store::ReferenceStore, key::String) 
