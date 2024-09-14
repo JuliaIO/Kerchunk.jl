@@ -7,7 +7,7 @@ we can register Kerchunk and users can use it without Zarr being an issue.
 
 =#
 
-import Zarr: Filter, zencode, zdecode, JSON, getfilter, filterdict
+import Zarr: Filter, zencode, zdecode, JSON, getfilter, filterdict, typestr
 
 #=
 # Delta compression
