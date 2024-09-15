@@ -12,7 +12,7 @@ This still relies on an experimental branch of Zarr.jl to read most Kerchunk fil
 
 ```julia
 ] 
-add Kerchunk Zarr#as/filters https://github.com/asinghvi17/Rasters.jl#as/makie_and_cf
+add Kerchunk
 ```
 
 (clean up by running `]free Zarr ZarrDatasets Rasters`)
