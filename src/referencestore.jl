@@ -196,22 +196,27 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
     # Extract the parameters, and reformat the URI
     params = URIs.queryparams(uri)
     uri = URIs.URI(uri; query = URIs.absent)
+    provided_path = URIs.uristring(uri)
     
     # If the URI's scheme is empty, we're resolving a local file path.
     # Note that we always use PosixPaths here, because the Zarr spec mandates that
     # all path separators be forward slashes.  Kerchunk also mandates this.
     file_path = if isempty(uri.scheme)
-        if isabspath(uri.uri)
-            FilePathsBase.PosixPath(uri.uri)
-        elseif ispath(uri.uri)
-            FilePathsBase.PosixPath(joinpath(pwd(), uri.uri))
+        if ispath(provided_path)
+            if isabspath(provided_path)
+                FilePathsBase.PosixPath(provided_path)
+            else
+                FilePathsBase.PosixPath(joinpath(pwd(), provided_path))
+            end
         else
-            error("Invalid path, presumed local but not resolvable as absolute or relative path: $(uri)")
+            error("Invalid path, presumed local but not resolvable as absolute or relative path: `$(uri)`")
         end
     elseif uri.scheme == "file" # Otherwise, we check the protocol and create the appropriate path type.
         FilePathsBase.Path(uri.path)
     elseif uri.scheme == "s3"
-        AWSS3.S3Path(uri.uri)
+        AWSS3.S3Path(provided_path)
+    else
+        FilePathsBase.@p_str uri.path
     end # TODO: add more protocols, like HTTP, Google Cloud, Azure, etc.
 
     rs = ReferenceStore(file_path) 
@@ -222,7 +227,7 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
     end
     # One could add more corrections here...
 
-    return rs, "" # ReferenceStore never has a relative path
+    return (rs, "") # ReferenceStore never has a relative path
 end
 
 function Zarr.subdirs(store::ReferenceStore, key)
