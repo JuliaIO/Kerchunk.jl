@@ -87,12 +87,12 @@ struct ReferenceStore{MapperType <: AbstractDict, HasTemplates} <: Zarr.Abstract
     cache_dir::String
 end
 
-function ReferenceStore(filename::Union{String, FilePathsBase.AbstractPath})
+function ReferenceStore(filename::Union{String, FilePathsBase.AbstractPath}; apply_cf_corrections = false)
     parsed = JSON3.read(read(filename))
-    return ReferenceStore(parsed)
+    return ReferenceStore(parsed; apply_cf_corrections)
 end
 
-function ReferenceStore(parsed::AbstractDict{<: Union{String, Symbol}, <: Any})
+function ReferenceStore(parsed::AbstractDict{<: Union{String, Symbol}, <: Any}; apply_cf_corrections = false)
     @assert haskey(parsed, "version") "ReferenceStore requires a version field, did not find one.  if you have a Kerchunk v0 then you have a problem!"
     @assert parsed["version"] in (1, "1") "ReferenceStore only supports Kerchunk version 1, found $(parsed["version"])"
     @assert !haskey(parsed, "gen") "ReferenceStore does not support generated paths, please file an issue on Github if you need these!"
@@ -123,7 +123,11 @@ function ReferenceStore(parsed::AbstractDict{<: Union{String, Symbol}, <: Any})
     cache_dict = Dict{String, Tuple{String}}()
     cache_dir = mktempdir(; prefix = "jl_kerchunk_", cleanup = true)
 
-    return ReferenceStore{typeof(refs), has_templates}(refs, zmetadata, templates, cache_dict, cache_dir)
+    rs = ReferenceStore{typeof(refs), has_templates}(refs, zmetadata, templates, cache_dict, cache_dir)
+    if apply_cf_corrections
+        apply_cf_corrections!(rs)
+    end
+    return rs
 end
 
 function Base.show(io::IO, ::MIME"text/plain", store::ReferenceStore)
@@ -221,8 +225,8 @@ function Zarr.storefromstring(::Type{<: ReferenceStore}, url, _)
 
     rs = ReferenceStore(file_path) 
 
-    # Apply corrections based on URI parameters / query if necessary
-    if haskey(params, "decode_cf") && lowercase(params["decode_cf"]) == "true"
+    # Apply corrections by default, but allow a switch in the query to disable them.
+    if !(haskey(params, "decode_cf") && lowercase(params["decode_cf"]) != "true")
         apply_cf_corrections!(rs)
     end
     # One could add more corrections here...
