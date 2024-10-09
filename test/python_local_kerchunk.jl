@@ -4,8 +4,7 @@ using Zarr, JSON3
 
 # You can't import kerchunk.hdf because importing h5py introduces a version of libhdf5 that is incompatible with any extant netcdf4_jll.
 
-
-using Rasters, NCDatasets, Dates, YAXArrays
+using Rasters, ArchGDAL, Dates, YAXArrays
 
 using Test
 
@@ -13,9 +12,9 @@ using Test
 
     # First, we create a NetCDF dataset:
 
-    ras = Raster(rand(LinRange(0, 10, 100), X(1:100), Y(5:150), Ti(DateTime("2000-01-31"):Month(1):DateTime("2001-01-31"))))
+    ras = Raster(rand(LinRange(0, 10, 100), X(1:100), Y(5:150), Band(1:12)))
 
-    write("test.nc", ras; source = :netcdf, force = true)
+    write("test.nc", ras; source = Rasters.GDALsource(), force = true)
     @test Raster("test.nc") == ras # test read-write roundtrip
 
     # Create a Kerchunk catalog.

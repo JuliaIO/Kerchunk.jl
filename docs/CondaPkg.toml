@@ -1,7 +1,6 @@
 [deps]
 # netcdf4 = ""
-virtualizarr = ""
-xarray = ""
+# virtualizarr = ""
 zarr = ""
 certifi = ""
 s3fs = ""

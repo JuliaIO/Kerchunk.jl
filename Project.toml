@@ -24,14 +24,16 @@ Zarr = "0.9"
 julia = "1.10"
 
 [extras]
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
+AWS = "fbe9abb3-538b-5e4e-ba9e-bc94f4f92ebc"
+AWSS3 = "1c724243-ef5b-51ab-93f4-b0a88ac62a95"
 CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
 Rasters = "a3a2b9e3-a471-40c9-b274-f788e487c689"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 YAXArrays = "c21b50f5-aa40-41ea-b809-c0f5e47bfa5c"
 
 [targets]
-test = ["CondaPkg", "PythonCall", "Dates", "JSON3", "NCDatasets", "Rasters", "YAXArrays", "Test"]
+test = ["ArchGDAL", "AWS", "AWSS3", "CondaPkg", "PythonCall", "Dates", "JSON3", "Rasters", "YAXArrays", "Test"]
