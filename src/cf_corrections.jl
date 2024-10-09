@@ -158,10 +158,10 @@ function move_compressor_from_filters!(zarray::Dict, zattrs::Dict)
     if get(zarray, "filters", nothing) |> isnothing
         return # No filters, so nothing to be done here
     else # there are some filters
-        if !isnothing(zarray["compressors"])
+        if !isnothing(zarray["compressor"])
             return # there is already a compressor, we can't have multiple
         else
-            if last(zarray["filters"]).id in keys(Zarr.compressortypes)
+            if last(zarray["filters"])["id"] in keys(Zarr.compressortypes)
                 compressor = pop!(zarray["filters"])
                 zarray["compressor"] = compressor
                 return
