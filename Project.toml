@@ -12,6 +12,7 @@ JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
 URIs = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
 Zarr = "0a941bbe-ad1d-11e8-39d9-ab76183a1d99"
+LERC_jll = "88015f11-f218-50d7-93a8-a6af411a945d"
 
 [compat]
 AWSS3 = "0.10, 0.11"
@@ -22,6 +23,7 @@ Mustache = "1"
 URIs = "1.5"
 Zarr = "0.9"
 julia = "1.10"
+LERC_jll = "3"
 
 [extras]
 ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
