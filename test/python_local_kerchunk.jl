@@ -12,7 +12,7 @@ using Test
 
     # First, we create a NetCDF dataset:
 
-    ras = Raster(rand(LinRange(0, 10, 100), X(1:100), Y(5:150), Band(1:12)))
+    ras = Raster(rand(LinRange(0, 10, 100), X(1:100), Y(5:150), Band(1:12)); crs = Rasters.EPSG(3413))
 
     write("test.nc", ras; source = Rasters.GDALsource(), force = true)
     @test Raster("test.nc") == ras # test read-write roundtrip
