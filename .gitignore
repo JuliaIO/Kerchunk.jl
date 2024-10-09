@@ -4,3 +4,5 @@
 
 /test/ref.parquet/
 /test/real_zarray.zarr/
+
+*/.CondaPkg/

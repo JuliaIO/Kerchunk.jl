@@ -1,5 +1,11 @@
+# The first thing to do is to make sure Python's dynamic libraries
+# are loaded first.
+using CondaPkg, PythonCall
+PythonCall.pyimport("aiohttp")
+
 using Kerchunk
 using Documenter, DocumenterVitepress
+
 
 DocMeta.setdocmeta!(Kerchunk, :DocTestSetup, :(using Kerchunk); recursive=true)
 
@@ -69,6 +75,12 @@ withenv("JULIA_DEBUG" => "Literate") do # allow Literate debug output to escape 
     # TODO: We should probably fix the above in `process_literate_recursive!`.
 end
 
+# Now, process the tutorials
+Literate.markdown(
+    joinpath("tutorials", "solar_dynamics_observatory.jl"), "tutorials"; 
+    flavor = Literate.DocumenterFlavor(), 
+)
+
 makedocs(;
     modules=[Kerchunk],
     authors="Anshul Singhvi <anshulsinghvi@gmail.com> and contributors",
@@ -77,6 +89,9 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "What is Kerchunk?" => "what_the_heck.md",
+        "Tutorials" => [
+            "tutorials/solar_dynamics_observatory.md",
+        ],
         "API" => "api.md",
         "Source code" => literate_pages,
     ],
