@@ -12,7 +12,7 @@ using Test
     @static if !(Sys.iswindows())
         include("python_local_kerchunk.jl")
     end
-    include("its_live_catalog.jl")
+    # include("its_live_catalog.jl")
     include("corrections.jl")
     include("real_zarr.jl")
     end

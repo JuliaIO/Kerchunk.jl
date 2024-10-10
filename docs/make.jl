@@ -77,7 +77,7 @@ end
 
 # Now, process the tutorials
 Literate.markdown(
-    joinpath("tutorials", "solar_dynamics_observatory.jl"), "tutorials"; 
+    joinpath("src", "tutorials", "solar_dynamics_observatory.jl"), joinpath("src", "tutorials"); 
     flavor = Literate.DocumenterFlavor(), 
 )
 
