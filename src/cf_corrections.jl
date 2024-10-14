@@ -145,7 +145,7 @@ function add_scale_offset_filter_and_set_mask!(zarray::Dict, zattrs::Dict)
     end
     zarray["filters"] = new_filters
     zarray["dtype"] = Zarr.typestr(Float64) # TODO: should this be f32??
-    if haskey(zarray, "fill_value")
+    if haskey(zarray, "fill_value") && haskey(zattrs, "_FillValue")
         zarray["fill_value"] = zattrs["_FillValue"] # TODO: this should be made obsolete!
     end
 end
