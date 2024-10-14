@@ -87,7 +87,7 @@ end
     add_scale_offset_filter_and_set_mask!(zarray::Dict, zattrs::Dict)
 
 Adapts the CF metadata convention of scale/offset, valid_range, _FillValue,
-and _Unsigned by modifying the Zarr metadata to add:
+and _Unsigned by modifying the Zarr metadata:
 - An additional reinterpretation filter is added to the filter stack
   if `_Unsigned=true`.  This allows the values to be interpreted as 
   UInts instead of Ints, which removes the sign error that would otherwise
@@ -95,6 +95,9 @@ and _Unsigned by modifying the Zarr metadata to add:
 - A `FixedScaleOffset` filter replaces `scale_factor` and `add_offset`.
 - `valid_range` and `_FillValue` are mutated based on the scale factor and added offset,
   and the native Zarr `fill_value` is replaced by the mutated and read `_FillValue`.
+
+The values of the other attributes depend on `_Unsigned`, so we unify all these changes
+into a single function.
 """
 function add_scale_offset_filter_and_set_mask!(zarray::Dict, zattrs::Dict)
     scale = get(zattrs, "scale_factor", 1.0)
@@ -118,10 +121,15 @@ function add_scale_offset_filter_and_set_mask!(zarray::Dict, zattrs::Dict)
         pushfirst!(collect(current_filters), filter_dict)
     end
     if haskey(zattrs, "_Unsigned") && zattrs["_Unsigned"] == "true" # correct for unsigned values
+        # Extract the _Unsigned attribute
         old_dtype = Zarr.typestr(zarray["dtype"])
         new_dtype = unsigned(old_dtype)
-        zattrs["_FillValue"] = reinterpret(new_dtype, old_dtype(zattrs["_FillValue"])) * scale + offset
         pop!(zattrs, "_Unsigned")
+
+        # Apply the scale and offset to the fill value, valid range, and valid min/max
+        if haskey(zattrs, "_FillValue")
+            zattrs["_FillValue"] = reinterpret(new_dtype, old_dtype(zattrs["_FillValue"])) * scale + offset
+        end
         if haskey(zattrs, "valid_range")
             zattrs["valid_range"] = reinterpret(new_dtype, old_dtype.(zattrs["valid_range"])) .* scale .+ offset
         end
