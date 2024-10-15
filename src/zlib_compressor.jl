@@ -1,6 +1,6 @@
 import Zarr: Compressor, zcompress, zuncompress, getCompressor, JSON, compressortypes
 
-using CodecZstd
+import CodecZstd
 
 """
     ZstdCompressor(clevel=-1)
