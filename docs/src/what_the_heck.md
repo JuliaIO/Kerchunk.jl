@@ -4,6 +4,29 @@
 
 ## Tips and tricks
 
+#### Where's my CRS?
+
+That's an interesting question.  Over the short term, Julia doesn't have support for CF-style (climate-and-forecast conventions) CRS metadata.  Additionally, CRS from e.g NetCDF files are stored as empty variables, which Kerchunk removes.  
+
+There are two places you might look for CRS information. 
+- First, see if the global metadata contains a `crs_wkt` or `spatial_ref` field.  If so, you can use that.  Other potential keys to look for are `proj4string`, `proj4text`, or `spatial_epsg`.
+- Second, you might find a `grid_mapping` metadata field in a layer / Zarr group, which will contain a link to the CRS.  If the value of that `grid_mapping` field is also a key in the global metadata, then that will contain the CRS.
+
+If you're using `Rasters.jl` to load the data, you can set the CRS on a `Raster` or `RasterStack` like this:
+
+```julia
+ras = Rasters.setcrs(ras, new_crs)
+```
+
+and if you have a WKT string, for example, you can construct `new_crs` like this:
+
+```julia
+new_crs = Rasters.ESRIWellKnownText(wkt_string)
+# or
+new_crs = Rasters.EPSG(epsg_code)
+# or
+new_crs = Rasters.ProjString(proj4_string)
+```
 
 #### S3 redirect errors
 

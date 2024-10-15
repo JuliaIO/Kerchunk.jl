@@ -6,6 +6,9 @@ PythonCall.pyimport("aiohttp")
 using Kerchunk
 using Documenter, DocumenterVitepress
 
+using Zarr.AWSS3.AWS
+AWS.global_aws_config(AWS.AWSConfig(; region = "us-west-2"))
+
 
 DocMeta.setdocmeta!(Kerchunk, :DocTestSetup, :(using Kerchunk); recursive=true)
 

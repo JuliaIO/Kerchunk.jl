@@ -1,5 +1,7 @@
 #=
 # ITS_LIVE data
+
+This package's development was motivated by the [ITS_LIVE](https://its-live.jpl.nasa.gov/) project.
 =#
 
 using Rasters       # Raster data analysis in Julia
