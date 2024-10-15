@@ -76,8 +76,13 @@ withenv("JULIA_DEBUG" => "Literate") do # allow Literate debug output to escape 
 end
 
 # Now, process the tutorials
+tutorials_path = joinpath(@__DIR__, "src", "tutorials")
 Literate.markdown(
-    joinpath(@__DIR__, "src", "tutorials", "solar_dynamics_observatory.jl"), joinpath(@__DIR__, "src", "tutorials"); 
+    joinpath(tutorials_path, "solar_dynamics_observatory.jl"), tutorials_path; 
+    flavor = Literate.DocumenterFlavor(), 
+)
+Literate.markdown(
+    joinpath(tutorials_path, "its_live.jl"), tutorials_path; 
     flavor = Literate.DocumenterFlavor(), 
 )
 
@@ -91,6 +96,7 @@ makedocs(;
         "What is Kerchunk?" => "what_the_heck.md",
         "Tutorials" => [
             "tutorials/solar_dynamics_observatory.md",
+            "tutorials/its_live.md",
         ],
         "API" => "api.md",
         "Source code" => literate_pages,

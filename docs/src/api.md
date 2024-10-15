@@ -1,6 +1,6 @@
 ```@index
 ```
 
-```@autodocs
-Modules = [Kerchunk]
+```@docs
+ReferenceFileSystem
 ```
