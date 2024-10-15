@@ -1,5 +1,7 @@
 import Zarr: Compressor, zcompress, zuncompress, getCompressor, JSON, compressortypes
 
+using CodecZstd
+
 """
     ZstdCompressor(clevel=-1)
 Returns a `ZstdCompressor` struct that can serve as a Zarr array compressor. Keyword arguments are:
