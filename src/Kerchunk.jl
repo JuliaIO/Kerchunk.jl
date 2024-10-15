@@ -16,8 +16,11 @@ include("readbytes.jl")
 # Reference store implementation
 include("referencestore.jl")
 
-# CF corrections in style
+# Missing Zarr filters
 include("astype_filter.jl")
+include("zlib_compressor.jl")
+
+# CF corrections in style
 include("cf_corrections.jl")
 
 # Materializing a reference store
@@ -37,6 +40,8 @@ export ZarrStorePath
 function __init__()
     push!(Zarr.storageregexlist, r"^reference://"=>ReferenceStore)
     Zarr.filterdict["astype"] = AstypeFilter
+    Zarr.compressortypes["zstd"] = ZstdCompressor
+
     @static if !(:FixedScaleOffsetFilter in names(Zarr; all = true))
         filterdict["delta"] = DeltaFilter
         filterdict["fixedscaleoffset"] = FixedScaleOffsetFilter
