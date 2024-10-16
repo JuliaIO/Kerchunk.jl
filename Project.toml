@@ -16,6 +16,7 @@ Zarr = "0a941bbe-ad1d-11e8-39d9-ab76183a1d99"
 
 [compat]
 AWSS3 = "0.10, 0.11"
+CodecZstd = "0.8"
 FilePathsBase = "0.9"
 HTTP = "1.10"
 JSON3 = "1"
