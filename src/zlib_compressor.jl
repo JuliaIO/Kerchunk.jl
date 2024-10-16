@@ -19,16 +19,16 @@ function getCompressor(::Type{ZstdCompressor}, d::Dict)
     ZstdCompressor(d["level"], get(d, "checksum", false))
 end
 
+JSON.lower(z::ZstdCompressor) = Dict("id"=>"zstd", "level" => z.level, "checksum" => z.checksum)
+
 function zuncompress(a, ::ZstdCompressor, T)
     result = transcode(CodecZstd.ZstdDecompressor,a)
-    @show size(result) typeof(result)
     Zarr._reinterpret(Base.nonmissingtype(T),result)
 end
 
 function zcompress(a, ::ZstdCompressor)
-    a_uint8 = Zarr._reinterpret(UInt8,a)[:]
+    a_uint8 = vec(Zarr._reinterpret(UInt8,a))
     transcode(CodecZstd.ZstdCompressor, a_uint8)
 end
 
-JSON.lower(z::ZstdCompressor) = Dict("id"=>"zstd", "level" => z.level, "checksum" => z.checksum)
 
