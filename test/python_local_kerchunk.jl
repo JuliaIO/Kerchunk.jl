@@ -15,7 +15,7 @@ using Test
     ras = Raster(rand(LinRange(0, 10, 100), X(1:100), Y(5:150), Band(1:12)); crs = Rasters.EPSG(3413))
 
     write("test.nc", ras; source = Rasters.GDALsource(), force = true)
-    @test Raster("test.nc") == ras # test read-write roundtrip
+    @test Raster("test.nc"; source = Rasters.GDALsource()) == ras # test read-write roundtrip
 
     # Create a Kerchunk catalog.
     # The reason I do this by `run` is because the hdf5 C library versions used by 
