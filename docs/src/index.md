@@ -45,7 +45,7 @@ This effort was funded by the NASA MEaSUREs program in contribution to the Inter
 ## Alternatives and related packages
 
 - You can always use Python's `xarray` directly via PythonCall.jl
-- [FSSpec.jl](https://github.com/asinghvi17/FSSpec.jl) is an alternative storage backends for Zarr.jl that wraps the same [`fsspec`](https://github.com/fsspec/filesystem_spec) that `xarray` uses under the hood.
+- [FSSpec.jl](https://github.com/asinghvi17/FSSpec.jl) is an alternative storage backend for Zarr.jl that wraps the same [`fsspec`](https://github.com/fsspec/filesystem_spec) that `xarray` uses under the hood.
 
 This package is of course built on top of [Zarr.jl](https://github.com/JuliaIO/Zarr.jl), which is a pure-Julia Zarr array library.
 [YAXArrays.jl](https://github.com/JuliaDataCubes/YAXArrays.jl) is a Julia package that can wrap Zarr arrays in a DimensionalData-compatible interface.

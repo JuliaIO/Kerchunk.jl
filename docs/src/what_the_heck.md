@@ -1,10 +1,21 @@
 # What is Kerchunk?
 
+Kerchunk is a powerful tool designed to optimize access to large scientific datasets, particularly those stored in cloud-based object stores. It addresses the challenges of working with numerous small files or large, chunked files by creating a unified, efficient interface for data access.
+
+At its core, Kerchunk works by creating a "fake" file system that maps to a Zarr store.  The file system describes a mapping from Zarr chunks to byte ranges of the source files.  
+
+This approach allows Kerchunk to effectively wrap one or many data files into a single Zarr array, providing a consolidated view of the data. By doing so, it enables faster data access, reduces the number of API calls needed to retrieve information (by essentially front-loading the process), and greatly simplifies the process of working with multi-file datasets.
+
+
 ## Available data sources
+
+The unit of Kerchunking is the _catalog_.  Each catalog is either a single JSON file or a directory of Parquet files.  The catalog is essentially a dictionary of file paths mapped to byte ranges. 
+
+Catalogs are "sidecar" files, and may not always be present with the original data.  Generally, at least for now, if there's no obvious Kerchunk file you would have to generate one yourself.
 
 ## Tips and tricks
 
-#### Where's my CRS?
+### Where's my CRS?
 
 That's an interesting question.  Over the short term, Julia doesn't have support for CF-style (climate-and-forecast conventions) CRS metadata.  Additionally, CRS from e.g NetCDF files are stored as empty variables, which Kerchunk removes.  
 
@@ -28,7 +39,7 @@ new_crs = Rasters.EPSG(epsg_code)
 new_crs = Rasters.ProjString(proj4_string)
 ```
 
-#### S3 redirect errors
+### S3 redirect errors
 
 Many S3 buckets are restricted to only allow access from certain regions.  If you get an error like this:
 ```
@@ -46,6 +57,6 @@ import AWS
 AWS.global_aws_config(AWS.AWSConfig(; region="us-west-2"))
 ```
 
-#### Version mismatches
+### Version mismatches
 
 Python and Julia load different versions of libraries, which can cause incompatibilities.  For example, both NCDatasets.jl and Python's netcdf4 library depend on libhdf5, but the versions they try to load are incompatible.

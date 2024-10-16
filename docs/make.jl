@@ -110,4 +110,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/JuliaIO/Kerchunk.jl",
     devbranch="main",
+    push_preview=true,
 )
