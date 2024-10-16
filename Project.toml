@@ -1,7 +1,7 @@
 name = "Kerchunk"
 uuid = "12c09fd5-fe6a-4e79-8f42-b31f49215243"
 authors = ["Anshul Singhvi <anshulsinghvi@gmail.com> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 AWSS3 = "1c724243-ef5b-51ab-93f4-b0a88ac62a95"
