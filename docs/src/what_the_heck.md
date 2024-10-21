@@ -11,7 +11,7 @@ This approach allows Kerchunk to effectively wrap one or many data files into a 
 
 The unit of Kerchunking is the _catalog_.  Each catalog is either a single JSON file or a directory of Parquet files.  The catalog is essentially a dictionary of file paths mapped to byte ranges. 
 
-Catalogs are "sidecar" files, and may not always be present with the original data.  Generally, at least for now, if there's no obvious Kerchunk file you would have to generate one yourself.
+Catalogs are "sidecar" files, and may not always be present with the original data.  Generally, at least for now, if there's no obvious Kerchunk file you would have to generate one yourself, using Python.  Julia support for constructing catalogs is currently nonexistent, but it's on the bucket list!
 
 ## Tips and tricks
 
